@@ -1,0 +1,54 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: helloworld
+  namespace: dev
+  labels:
+    app: helloworld
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: helloworld
+  template:
+    metadata:
+      labels:
+        app: helloworld
+    spec:
+      containers:
+        - name: helloworld
+          image: llsgscv.azurecr.io/dev/active_campaign
+          # volumeMounts:
+          #   - mountPath: "/temp"
+          #     name: helloworld-volume
+          # envFrom:
+          # - secretRef:
+          #     name: secrets
+          # - configMapRef:
+          #     name: environment
+      imagePullSecrets:
+      - name: lls
+      affinity: 
+        nodeAffinity:
+              requiredDuringSchedulingIgnoredDuringExecution:
+                nodeSelectorTerms:
+                - matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                    - scv-821kp
+              preferredDuringSchedulingIgnoredDuringExecution:
+              - weight: 1
+                preference:
+                  matchExpressions:
+                  - key: kubernetes.io/hostname
+                    operator: In
+                    values:
+                    - scv-821kp
+      # volumes:
+      #   - name: helloworld-volume
+      #     hostPath:
+      #       # directory location on host
+      #       path: /opt/volumes/helloworld-volume
+      #       # this field is optional
+      #       type: DirectoryOrCreate
