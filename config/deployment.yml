@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: helloworld
-          image: llsgscv.azurecr.io/dev/active_campaign
+          image: lls/llsgscv-dev/helloworld
           # volumeMounts:
           #   - mountPath: "/temp"
           #     name: helloworld-volume
