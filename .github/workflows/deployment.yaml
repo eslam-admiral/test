@@ -17,16 +17,16 @@ jobs:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}  
 
     - name: Build container image
-      run: docker build -t registry.digitalocean.com/lls/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
+      run: docker build -t registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200    
 
     - name: Push image to DigitalOcean Container Registry
-      run: docker push registry.digitalocean.com/lls/${{ secrets.registry }}/llsgscv-dev/helloworld:latest  
+      run: docker push registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest  
 
     - name: Update deployment file
-      run: TAG=latest && sed -i 's|<IMAGE>|registry.digitalocean.com/lls/${{ secrets.registry }}/llsgscv-dev/helloworld:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
+      run: TAG=latest && sed -i 's|<IMAGE>|registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Save DigitalOcean kubeconfig with short-lived credentials
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
@@ -35,4 +35,4 @@ jobs:
       run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Verify deployment
-      run: kubectl rollout status deployment/helloworld
+      run: kubectl -n dev rollout status deployment/helloworld
