@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: helloworld
-          image: lls/llsgscv-dev/helloworld
+          image: lls/llsgscv-dev/helloworld:latest
           # volumeMounts:
           #   - mountPath: "/temp"
           #     name: helloworld-volume
