@@ -2,6 +2,7 @@ on:
   push:
     branches:
       - staging
+      - development
     tags:
         - 'v*'    
 jobs:
@@ -9,18 +10,44 @@ jobs:
     runs-on: ubuntu-latest
     steps:       
     - name: Checkout master
-      uses: actions/checkout@main
+      uses: actions/checkout@v2
+
+    - name: Get Current Pull Request
+      uses: 8BitJonny/gh-get-current-pr@1.0.1
+      id: pr
+      with:
+        github-token: $
+        filterOutClosed: true
+
+    - id: file_changes
+      name: File Changes
+      uses: trilom/file-changes-action@v1.2.3
+      with:
+        prNumber: $
+        pushBefore: ''
+        pushAfter: ''
+
+    - name: Ouput File Changes
+      run: echo '$'  
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
       with:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}  
 
-    - name: Build container image
+    - name: Build python
       uses: flownative/action-docker-publish-semver@v1.2.0
       with:
           tag_ref: ${{ github.ref }}
           image_name: registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
+      if: contains(steps.file_changes.outputs.files , '"projects/python')    
+
+    - name: Build helloworld
+      uses: flownative/action-docker-publish-semver@v1.2.0
+      with:
+          tag_ref: ${{ github.ref }}
+          image_name: registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')    
           # registry_password: ${{ secrets.GITHUB_TOKEN }}
       # run: docker build -t registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
 
@@ -38,12 +65,12 @@ jobs:
     # - name: Update deployment file
     #   run: TAG=latest && sed -i 's|<IMAGE>|registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
-    - name: Save DigitalOcean kubeconfig with short-lived credentials
-      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
+    # - name: Save DigitalOcean kubeconfig with short-lived credentials
+    #   run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
 
-    - name: Deploy to DigitalOcean Kubernetes
-      run: kubectl -n staging --record deployment.apps/${{GITHUB_WORKFLOW}} set image deployment.v1.apps/${{GITHUB_WORKFLOW}} registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
-      # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
+    # - name: Deploy to DigitalOcean Kubernetes
+    #   run: kubectl -n staging --record deployment.apps/${{GITHUB_WORKFLOW}} set image deployment.v1.apps/${{GITHUB_WORKFLOW}} registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
+    #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
-    - name: Verify deployment
-      run: kubectl -n dev rollout status deployment/${{GITHUB_WORKFLOW}}
+    # - name: Verify deployment
+    #   run: kubectl -n staging rollout status deployment/${{GITHUB_WORKFLOW}}
