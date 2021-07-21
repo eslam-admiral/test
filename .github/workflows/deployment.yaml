@@ -40,14 +40,14 @@ jobs:
       with:
           tag_ref: ${{ github.ref }}
           image_name: registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
-      if: contains(steps.file_changes.outputs.files , '"projects/python')    
+      # if: contains(steps.file_changes.outputs.files , '"projects/python')    
 
     - name: Build helloworld
       uses: flownative/action-docker-publish-semver@v1.2.0
       with:
           tag_ref: ${{ github.ref }}
           image_name: registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
-      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')    
+      # if: contains(steps.file_changes.outputs.files , '"projects/helloworld')    
           # registry_password: ${{ secrets.GITHUB_TOKEN }}
       # run: docker build -t registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
 
