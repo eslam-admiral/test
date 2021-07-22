@@ -17,7 +17,7 @@ jobs:
       uses: 8BitJonny/gh-get-current-pr@1.0.1
       id: pr
       with:
-        github-token: $
+        github-token: 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
         filterOutClosed: true
 
     - id: file_changes
