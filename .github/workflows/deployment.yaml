@@ -43,7 +43,7 @@ jobs:
       if: contains(steps.file_changes.outputs.files , '"projects/python')    
 
     - name: Build helloworld
-      uses: flownative/action-docker-publish-semver@v1.2.0
+      uses: flownative/action-docker-build@master
       with:
           tag_ref: ${{ github.ref }}
           image_name: registry.digitalocean.com/${{ secrets.registry }}/helloworld:${{ github.ref }}-${{github.run_number}}
