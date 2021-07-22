@@ -12,14 +12,6 @@ jobs:
     - name: Checkout master
       uses: actions/checkout@v2
 
-    - uses: actions/checkout@v1
-    - name: Get Current Pull Request
-      uses: 8BitJonny/gh-get-current-pr@1.0.1
-      id: pr
-      with:
-        github-token: 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
-        filterOutClosed: true
-
     - id: file_changes
       name: File Changes
       uses: trilom/file-changes-action@v1.2.3
@@ -27,9 +19,6 @@ jobs:
         prNumber: $
         pushBefore: ''
         pushAfter: ''
-
-    - name: Ouput File Changes
-      run: echo '$'  
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
