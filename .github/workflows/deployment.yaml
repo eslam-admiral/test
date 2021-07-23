@@ -109,11 +109,11 @@ jobs:
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
 
     - name: Deploy python to DigitalOcean Kubernetes
-      run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/python set image deployment.v1.apps/python python=registry.digitalocean.com/${{ secrets.registry }}/python:v1.0.0-${{github.run_number}}
+      run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/python set image deployment.v1.apps/python python=registry.digitalocean.com/${{ secrets.registry }}/python:1.0.0-${{github.run_number}}
       if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Deploy helloworld to DigitalOcean Kubernetes
-      run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/helloworld set image deployment.v1.apps/helloworld helloworld=registry.digitalocean.com/${{ secrets.registry }}/helloworld:v1.0.0-${{github.run_number}}
+      run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/helloworld set image deployment.v1.apps/helloworld helloworld=registry.digitalocean.com/${{ secrets.registry }}/helloworld:1.0.0-${{github.run_number}}
       if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
     #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
