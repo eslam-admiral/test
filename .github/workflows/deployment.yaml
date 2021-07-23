@@ -38,7 +38,7 @@ jobs:
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}
-      if: contains(steps.file_changes.outputs.files , '"projects/python')     
+      #if: contains(steps.file_changes.outputs.files , '"projects/python')     
 
     - name: Docker meta for helloworld
       id: meta2
@@ -50,7 +50,7 @@ jobs:
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
           type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}
-      if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
+      #if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
     - name: Build python and push
       uses: docker/build-push-action@v2
@@ -59,7 +59,7 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta1.outputs.tags }}
         labels: ${{ steps.meta1.outputs.labels }}
-      if: contains(steps.file_changes.outputs.files , '"projects/python')      
+      #if: contains(steps.file_changes.outputs.files , '"projects/python')      
     
     - name: Build helloworld and push
       uses: docker/build-push-action@v2
@@ -68,7 +68,7 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta2.outputs.tags }}
         labels: ${{ steps.meta2.outputs.labels }}
-      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')  
+      #if: contains(steps.file_changes.outputs.files , '"projects/helloworld')  
     # - name: Build python
     #   uses: flownative/action-docker-build@master
     #   with:
@@ -76,14 +76,14 @@ jobs:
     #       tag_ref: ${{  steps.extract_branch.outputs.branch  }}
     #       image_name: registry.digitalocean.com/${{ secrets.registry }}/python:${{  steps.extract_branch.outputs.branch  }}-${{ github.run_number }}
     #       registry_password: 68a12a9d6b189a17ebd40cdc38a31e20edf148e0a939149ec1cc19ecfa7d4b93:68a12a9d6b189a17ebd40cdc38a31e20edf148e0a939149ec1cc19ecfa7d4b93
-    #   if: contains(steps.file_changes.outputs.files , '"projects/python')    
+    #   #if: contains(steps.file_changes.outputs.files , '"projects/python')    
 
     # - name: Build helloworld
     #   uses: flownative/action-docker-build@master
     #   with:
     #       tag_ref: ${{  steps.extract_branch.outputs.branch  }}
     #       image_name: registry.digitalocean.com/${{ secrets.registry }}/helloworld:${{  steps.extract_branch.outputs.branch  }}-${{github.run_number}}
-    #   if: contains(steps.file_changes.outputs.files , '"projects/helloworld')    
+    #   #if: contains(steps.file_changes.outputs.files , '"projects/helloworld')    
           # registry_password: ${{ secrets.GITHUB_TOKEN }}
       # run: docker build -t registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
 
@@ -110,18 +110,18 @@ jobs:
 
     - name: Deploy python to DigitalOcean Kubernetes
       run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/python set image deployment.v1.apps/python python=registry.digitalocean.com/${{ secrets.registry }}/python:1.0.0-${{github.run_number}}
-      if: contains(steps.file_changes.outputs.files , '"projects/python') 
+      #if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Deploy helloworld to DigitalOcean Kubernetes
       run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/helloworld set image deployment.v1.apps/helloworld helloworld=registry.digitalocean.com/${{ secrets.registry }}/helloworld:1.0.0-${{github.run_number}}
-      if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
+      #if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
     #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Verify python deployment
       run: kubectl -n ${{ steps.extract_branch.outputs.branch }} rollout status deployment/python
-      if: contains(steps.file_changes.outputs.files , '"projects/python') 
+      #if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Verify helloworld deployment
       run: kubectl -n ${{ steps.extract_branch.outputs.branch }} rollout status deployment/helloworld 
-      if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
+      #if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
