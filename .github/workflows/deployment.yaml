@@ -105,19 +105,19 @@ jobs:
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
 
     - name: Deploy python to DigitalOcean Kubernetes
-      run: kubectl -n $GITHUB_REF --record deployment.apps/python set image deployment.v1.apps/python registry.digitalocean.com/${{ secrets.registry }}/python:v1.0.0-${{github.run_number}}
+      run: kubectl -n ${{github.ref}} --record deployment.apps/python set image deployment.v1.apps/python registry.digitalocean.com/${{ secrets.registry }}/python:v1.0.0-${{github.run_number}}
       if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Deploy helloworld to DigitalOcean Kubernetes
-      run: kubectl -n $GITHUB_REF --record deployment.apps/helloworld set image deployment.v1.apps/helloworld registry.digitalocean.com/${{ secrets.registry }}/helloworld:v1.0.0-${{github.run_number}}
+      run: kubectl -n ${{github.ref}} --record deployment.apps/helloworld set image deployment.v1.apps/helloworld registry.digitalocean.com/${{ secrets.registry }}/helloworld:v1.0.0-${{github.run_number}}
       if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
     #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Verify python deployment
-      run: kubectl -n ${{ github.ref }} rollout status deployment/python
+      run: kubectl -n ${{github.ref}} rollout status deployment/python
       if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Verify helloworld deployment
-      run: kubectl -n ${{ github.ref }} rollout status deployment/helloworld 
+      run: kubectl -n ${{github.ref}} rollout status deployment/helloworld 
       if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
