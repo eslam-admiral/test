@@ -29,7 +29,7 @@ jobs:
       run: doctl registry login --expiry-seconds 1200       
 
     - name: Docker meta for python
-      id: meta
+      id: meta1
       uses: docker/metadata-action@v3
       with:
         images: registry.digitalocean.com/${{ secrets.registry }}/python
@@ -41,7 +41,7 @@ jobs:
       if: contains(steps.file_changes.outputs.files , '"projects/python')     
 
     - name: Docker meta for helloworld
-      id: meta
+      id: meta2
       uses: docker/metadata-action@v3
       with:
         images: registry.digitalocean.com/${{ secrets.registry }}/helloworld
@@ -57,8 +57,8 @@ jobs:
       with:
         context: ./projects/python
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta1.outputs.tags }}
+        labels: ${{ steps.meta1.outputs.labels }}
       if: contains(steps.file_changes.outputs.files , '"projects/python')      
     
     - name: Build helloworld and push
@@ -66,8 +66,8 @@ jobs:
       with:
         context: ./projects/helloworld
         push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ steps.meta.outputs.tags }}
-        labels: ${{ steps.meta.outputs.labels }}
+        tags: ${{ steps.meta2.outputs.tags }}
+        labels: ${{ steps.meta2.outputs.labels }}
       if: contains(steps.file_changes.outputs.files , '"projects/helloworld')  
     # - name: Build python
     #   uses: flownative/action-docker-build@master
