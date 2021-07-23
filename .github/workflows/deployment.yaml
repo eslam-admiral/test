@@ -115,9 +115,9 @@ jobs:
     #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Verify python deployment
-      run: kubectl -n $GITHUB_REF rollout status deployment/python
+      run: kubectl -n ${{ github.ref }} rollout status deployment/python
       if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Verify helloworld deployment
-      run: kubectl -n $GITHUB_REF rollout status deployment/helloworld 
+      run: kubectl -n ${{ github.ref }} rollout status deployment/helloworld 
       if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
