@@ -28,7 +28,7 @@ jobs:
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200       
 
-    - name: Docker meta
+    - name: Docker meta for python
       id: meta
       uses: docker/metadata-action@v3
       with:
@@ -37,6 +37,18 @@ jobs:
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}
+      if: contains(steps.file_changes.outputs.files , '"projects/python')     
+
+    - name: Docker meta for helloworld
+      id: meta
+      uses: docker/metadata-action@v3
+      with:
+        images: registry.digitalocean.com/${{ secrets.registry }}/helloworld
+        tags: |
+          type=ref,event=pr
+          type=semver,pattern={{version}}
+          type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
     - name: Build python and push
       uses: docker/build-push-action@v2
@@ -46,7 +58,15 @@ jobs:
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
       if: contains(steps.file_changes.outputs.files , '"projects/python')      
-
+    
+    - name: Build helloworld and push
+      uses: docker/build-push-action@v2
+      with:
+        context: ./projects/helloworld
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ steps.meta.outputs.tags }}
+        labels: ${{ steps.meta.outputs.labels }}
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')  
     # - name: Build python
     #   uses: flownative/action-docker-build@master
     #   with:
@@ -79,12 +99,23 @@ jobs:
     # - name: Update deployment file
     #   run: TAG=latest && sed -i 's|<IMAGE>|registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
-    # - name: Save DigitalOcean kubeconfig with short-lived credentials
-    #   run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
+    - name: Save DigitalOcean kubeconfig with short-lived credentials
+      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
 
-    # - name: Deploy to DigitalOcean Kubernetes
-    #   run: kubectl -n staging --record deployment.apps/${{GITHUB_WORKFLOW}} set image deployment.v1.apps/${{GITHUB_WORKFLOW}} registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
+    - name: Deploy python to DigitalOcean Kubernetes
+      run: kubectl -n $GITHUB_REF --record deployment.apps/python set image deployment.v1.apps/python registry.digitalocean.com/${{ secrets.registry }}/python:v1.0.0-${{github.run_number}}
+      if: contains(steps.file_changes.outputs.files , '"projects/python') 
+
+    - name: Deploy helloworld to DigitalOcean Kubernetes
+      run: kubectl -n $GITHUB_REF --record deployment.apps/helloworld set image deployment.v1.apps/helloworld registry.digitalocean.com/${{ secrets.registry }}/helloworld:v1.0.0-${{github.run_number}}
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
+
     #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
-    # - name: Verify deployment
-    #   run: kubectl -n staging rollout status deployment/${{GITHUB_WORKFLOW}}
+    - name: Verify python deployment
+      run: kubectl -n $GITHUB_REF rollout status deployment/python
+      if: contains(steps.file_changes.outputs.files , '"projects/python') 
+
+    - name: Verify helloworld deployment
+      run: kubectl -n $GITHUB_REF rollout status deployment/helloworld 
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
