@@ -8,7 +8,7 @@ on:
 jobs:
   build-python:
     runs-on: ubuntu-latest
-    if: contains(steps.file_changes.outputs.files , '"projects/python')  
+    # if: contains(steps.file_changes.outputs.files , '"projects/python')  
     steps:       
     - name: Checkout master
       uses: actions/checkout@v2
@@ -95,13 +95,12 @@ jobs:
 
     - name: Verify python deployment
       run: kubectl -n $GITHUB_REF rollout status deployment/python
-      # if: contains(steps.file_changes.outputs.files , '"projects/python') 
+    if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
 
   
   build-helloworld:    
     runs-on: ubuntu-latest
-    if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
     steps:       
     - name: Checkout master
       uses: actions/checkout@v2
@@ -147,6 +146,8 @@ jobs:
       run: kubectl -n $GITHUB_REF --record deployment.apps/helloworld set image deployment.v1.apps/helloworld registry.digitalocean.com/${{ secrets.registry }}/helloworld:v1.0.0-${{github.run_number}}
 
     - name: Verify helloworld deployment
-      run: kubectl -n $GITHUB_REF rollout status deployment/helloworld       
+      run: kubectl -n $GITHUB_REF rollout status deployment/helloworld     
+    if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
+    
             
 
