@@ -12,6 +12,7 @@ jobs:
     steps:       
     - name: Checkout master
       uses: actions/checkout@v2
+      if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - id: file_changes
       name: File Changes
@@ -20,14 +21,17 @@ jobs:
         prNumber: $
         pushBefore: ''
         pushAfter: ''
+      if: contains(steps.file_changes.outputs.files , '"projects/python')   
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
       with:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      if: contains(steps.file_changes.outputs.files , '"projects/python')   
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
-      run: doctl registry login --expiry-seconds 1200       
+      run: doctl registry login --expiry-seconds 1200    
+      if: contains(steps.file_changes.outputs.files , '"projects/python')    
 
     - name: Docker meta for python
       id: meta
@@ -38,7 +42,7 @@ jobs:
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}
-      # if: contains(steps.file_changes.outputs.files , '"projects/python')     
+      if: contains(steps.file_changes.outputs.files , '"projects/python')     
 
     - name: Build python and push
       uses: docker/build-push-action@v2
@@ -47,7 +51,7 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
-      # if: contains(steps.file_changes.outputs.files , '"projects/python')      
+      if: contains(steps.file_changes.outputs.files , '"projects/python')      
     
 
     # - name: Build python
@@ -84,10 +88,11 @@ jobs:
 
     - name: Save DigitalOcean kubeconfig with short-lived credentials
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
+      if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Deploy python to DigitalOcean Kubernetes
       run: kubectl -n $GITHUB_REF --record deployment.apps/python set image deployment.v1.apps/python registry.digitalocean.com/${{ secrets.registry }}/python:v1.0.0-${{github.run_number}}
-      # if: contains(steps.file_changes.outputs.files , '"projects/python') 
+      if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
 
 
@@ -95,7 +100,7 @@ jobs:
 
     - name: Verify python deployment
       run: kubectl -n $GITHUB_REF rollout status deployment/python
-    if: contains(steps.file_changes.outputs.files , '"projects/python') 
+      if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
 
   
@@ -104,6 +109,7 @@ jobs:
     steps:       
     - name: Checkout master
       uses: actions/checkout@v2
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
 
     - id: file_changes
       name: File Changes
@@ -112,14 +118,17 @@ jobs:
         prNumber: $
         pushBefore: ''
         pushAfter: ''
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')  
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
       with:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')  
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200  
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
 
     - name: Docker meta for helloworld
       id: meta
@@ -129,7 +138,8 @@ jobs:
         tags: |
           type=ref,event=pr
           type=semver,pattern={{version}}
-          type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}      
+          type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}   
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')       
           
     - name: Build helloworld and push
       uses: docker/build-push-action@v2
@@ -138,16 +148,19 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')  
 
     - name: Save DigitalOcean kubeconfig with short-lived credentials
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
 
     - name: Deploy helloworld to DigitalOcean Kubernetes
       run: kubectl -n $GITHUB_REF --record deployment.apps/helloworld set image deployment.v1.apps/helloworld registry.digitalocean.com/${{ secrets.registry }}/helloworld:v1.0.0-${{github.run_number}}
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
 
     - name: Verify helloworld deployment
       run: kubectl -n $GITHUB_REF rollout status deployment/helloworld     
-    if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
+      if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
     
             
 
