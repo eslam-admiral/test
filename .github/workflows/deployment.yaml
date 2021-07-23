@@ -7,8 +7,8 @@ on:
         - 'v*'    
 jobs:
   build-python:
-    if: contains(steps.file_changes.outputs.files , '"projects/python')  
     runs-on: ubuntu-latest
+    if: contains(steps.file_changes.outputs.files , '"projects/python')  
     steps:       
     - name: Checkout master
       uses: actions/checkout@v2
@@ -100,8 +100,8 @@ jobs:
 
   
   build-helloworld:    
-    if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
     runs-on: ubuntu-latest
+    if: contains(steps.file_changes.outputs.files , '"projects/helloworld')
     steps:       
     - name: Checkout master
       uses: actions/checkout@v2
