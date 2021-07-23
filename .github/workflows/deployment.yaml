@@ -73,16 +73,16 @@ jobs:
     #   uses: flownative/action-docker-build@master
     #   with:
     #       context: ./projects/python
-    #       tag_ref: ${{ github.base_ref }}
-    #       image_name: registry.digitalocean.com/${{ secrets.registry }}/python:${{ github.base_ref }}-${{ github.run_number }}
+    #       tag_ref: ${{ github.ref##*/ }}
+    #       image_name: registry.digitalocean.com/${{ secrets.registry }}/python:${{ github.ref##*/ }}-${{ github.run_number }}
     #       registry_password: 68a12a9d6b189a17ebd40cdc38a31e20edf148e0a939149ec1cc19ecfa7d4b93:68a12a9d6b189a17ebd40cdc38a31e20edf148e0a939149ec1cc19ecfa7d4b93
     #   if: contains(steps.file_changes.outputs.files , '"projects/python')    
 
     # - name: Build helloworld
     #   uses: flownative/action-docker-build@master
     #   with:
-    #       tag_ref: ${{ github.base_ref }}
-    #       image_name: registry.digitalocean.com/${{ secrets.registry }}/helloworld:${{ github.base_ref }}-${{github.run_number}}
+    #       tag_ref: ${{ github.ref##*/ }}
+    #       image_name: registry.digitalocean.com/${{ secrets.registry }}/helloworld:${{ github.ref##*/ }}-${{github.run_number}}
     #   if: contains(steps.file_changes.outputs.files , '"projects/helloworld')    
           # registry_password: ${{ secrets.GITHUB_TOKEN }}
       # run: docker build -t registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
@@ -93,7 +93,7 @@ jobs:
     # - name: Push image to DigitalOcean Container Registry
     #   uses: flownative/action-docker-publish-semver@master
     #   with:
-    #     tag_ref: ${{ github.base_ref }}
+    #     tag_ref: ${{ github.ref##*/ }}
     #     tag_latest: 'yes'
     #     tag_custom: 'some-custom-tag'      
       # run: docker push registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest  
@@ -105,19 +105,19 @@ jobs:
       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
 
     - name: Deploy python to DigitalOcean Kubernetes
-      run: kubectl -n ${{github.base_ref}} --record deployment.apps/python set image deployment.v1.apps/python registry.digitalocean.com/${{ secrets.registry }}/python:v1.0.0-${{github.run_number}}
+      run: kubectl -n ${{github.ref##*/}} --record deployment.apps/python set image deployment.v1.apps/python registry.digitalocean.com/${{ secrets.registry }}/python:v1.0.0-${{github.run_number}}
       if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Deploy helloworld to DigitalOcean Kubernetes
-      run: kubectl -n ${{github.base_ref}} --record deployment.apps/helloworld set image deployment.v1.apps/helloworld registry.digitalocean.com/${{ secrets.registry }}/helloworld:v1.0.0-${{github.run_number}}
+      run: kubectl -n ${{github.ref##*/}} --record deployment.apps/helloworld set image deployment.v1.apps/helloworld registry.digitalocean.com/${{ secrets.registry }}/helloworld:v1.0.0-${{github.run_number}}
       if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
     #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
     - name: Verify python deployment
-      run: kubectl -n ${{github.base_ref}} rollout status deployment/python
+      run: kubectl -n ${{github.ref##*/}} rollout status deployment/python
       if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
     - name: Verify helloworld deployment
-      run: kubectl -n ${{github.base_ref}} rollout status deployment/helloworld 
+      run: kubectl -n ${{github.ref##*/}} rollout status deployment/helloworld 
       if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
