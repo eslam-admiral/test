@@ -41,7 +41,6 @@ jobs:
         push: ${{ github.event_name != 'pull_request' }}
         tags: ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}}, ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest
         labels: ${{ steps.meta1.outputs.labels }}
-      run: echo  "${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}}"
 
     - name: Build python-dev and push
       if: github.ref == 'refs/heads/development'
