@@ -12,13 +12,13 @@ jobs:
     - name: Checkout master
       uses: actions/checkout@v2
 
-    - id: file_changes
-      name: File Changes
-      uses: trilom/file-changes-action@v1.2.3
-      with:
-        prNumber: $
-        pushBefore: ''
-        pushAfter: ''
+    # - id: file_changes
+    #   name: File Changes
+    #   uses: trilom/file-changes-action@v1.2.3
+    #   with:
+    #     prNumber: $
+    #     pushBefore: ''
+    #     pushAfter: ''
 
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
