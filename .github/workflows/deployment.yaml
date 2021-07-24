@@ -27,11 +27,16 @@ jobs:
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
+      
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
 
-    - name: Build and push
+    - name: taging
       id: gen_tags
       run: |
-        if [[ github.ref == 'refs/heads/staging']]; then
+        if [[ ${{  steps.extract_branch.outputs.branch  }} == staging ]]; then
           value='["'${{github.run_number}}'"]'
         else
           value='["latest"]'
