@@ -1,0 +1,55 @@
+on:
+  push:
+    branches:
+      - staging
+      - development
+    tags:
+        - 'v*'    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:       
+    - name: Checkout master
+      uses: actions/checkout@v2
+
+    - id: file_changes
+      name: File Changes
+      uses: trilom/file-changes-action@v1.2.3
+      with:
+        prNumber: $
+        pushBefore: ''
+        pushAfter: ''
+
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 1200
+
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch
+
+    - uses: docker/build-push-action@v2
+    - name: Build python-staging and push
+      if: github.ref == 'refs/heads/staging'
+      with:
+        context: ./projects/python
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}}و ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest
+        labels: ${{ steps.meta1.outputs.labels }}
+
+    - name: Build python-dev and push
+      if: github.ref == 'refs/heads/development'
+      with:
+        context: ./projects/python
+        push: ${{ github.event_name != 'pull_request' }}
+        tags: ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest
+        labels: ${{ steps.meta1.outputs.labels }}    
+
+
+
+
