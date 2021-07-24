@@ -37,9 +37,9 @@ jobs:
       id: gen_tags
       run: |
         if [[ ${{  steps.extract_branch.outputs.branch  }} == staging ]]; then
-          TAGS='["'${{github.run_number}}'"]'
+          TAGS=${{github.run_number}}
         else
-          TAGS='["latest"]'
+          TAGS=latest
         fi
         echo '::set-output name=tags::' $TAGS             
 
