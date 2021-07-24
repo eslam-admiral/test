@@ -34,7 +34,7 @@ jobs:
       id: extract_branch
 
     - uses: docker/build-push-action@v2
-    - name: Build python-staging and push
+      name: Build python-staging and push
       if: github.ref == 'refs/heads/staging'
       with:
         context: ./projects/python
