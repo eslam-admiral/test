@@ -26,7 +26,17 @@ jobs:
         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
-      run: doctl registry login --expiry-seconds 1200       
+      run: doctl registry login --expiry-seconds 1200
+
+    - name: Build and push
+      id: gen_tags
+      run: |
+        if [[ github.ref == 'refs/heads/staging']]; then
+          value='["'${{github.run_number}}'"]'
+        else
+          value='["latest"]'
+        fi
+        echo '::set-output name=value::'$value             
 
     - name: Docker meta for python
       id: meta1
@@ -37,7 +47,7 @@ jobs:
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}
+          type=semver,pattern={{version}},value=${{ fromJson(steps.gen_tags.outputs.value) }}
       #if: contains(steps.file_changes.outputs.files , '"projects/python')     
 
     - name: Docker meta for helloworld
@@ -49,7 +59,7 @@ jobs:
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{version}},value=v1.0.0-${{github.run_number}}
+          type=semver,pattern={{version}},value=${{ fromJson(steps.gen_tags.outputs.value) }}
       #if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
     - name: Build python and push
@@ -100,28 +110,28 @@ jobs:
 
     # - name: Update deployment file
     #   run: TAG=latest && sed -i 's|<IMAGE>|registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
+    # - name: Extract branch name
+    #   shell: bash
+    #   run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+    #   id: extract_branch
 
-    - name: Save DigitalOcean kubeconfig with short-lived credentials
-      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
+    # - name: Save DigitalOcean kubeconfig with short-lived credentials
+    #   run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
 
-    - name: Deploy python to DigitalOcean Kubernetes
-      run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/python set image deployment.v1.apps/python python=registry.digitalocean.com/${{ secrets.registry }}/python:1.0.0-${{github.run_number}}
-      #if: contains(steps.file_changes.outputs.files , '"projects/python') 
+    # - name: Deploy python to DigitalOcean Kubernetes
+    #   run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/python set image deployment.v1.apps/python python=registry.digitalocean.com/${{ secrets.registry }}/python:1.0.0-${{github.run_number}}
+    #   #if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
-    - name: Deploy helloworld to DigitalOcean Kubernetes
-      run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/helloworld set image deployment.v1.apps/helloworld helloworld=registry.digitalocean.com/${{ secrets.registry }}/helloworld:1.0.0-${{github.run_number}}
-      #if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
+    # - name: Deploy helloworld to DigitalOcean Kubernetes
+    #   run: kubectl -n ${{ steps.extract_branch.outputs.branch }} --record deployment.apps/helloworld set image deployment.v1.apps/helloworld helloworld=registry.digitalocean.com/${{ secrets.registry }}/helloworld:1.0.0-${{github.run_number}}
+    #   #if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
-    #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
+    # #   # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
-    - name: Verify python deployment
-      run: kubectl -n ${{ steps.extract_branch.outputs.branch }} rollout status deployment/python
-      #if: contains(steps.file_changes.outputs.files , '"projects/python') 
+    # - name: Verify python deployment
+    #   run: kubectl -n ${{ steps.extract_branch.outputs.branch }} rollout status deployment/python
+    #   #if: contains(steps.file_changes.outputs.files , '"projects/python') 
 
-    - name: Verify helloworld deployment
-      run: kubectl -n ${{ steps.extract_branch.outputs.branch }} rollout status deployment/helloworld 
+    # - name: Verify helloworld deployment
+    #   run: kubectl -n ${{ steps.extract_branch.outputs.branch }} rollout status deployment/helloworld 
       #if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
