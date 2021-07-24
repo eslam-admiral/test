@@ -41,7 +41,7 @@ jobs:
         else
           export TAGS=latest
         fi
-        echo '::set-output name=tags::'$TAGS             
+        echo $TAGS             
 
     - name: Docker meta for python
       id: meta1
