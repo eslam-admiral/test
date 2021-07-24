@@ -41,7 +41,7 @@ jobs:
         else
           TAGS=latest
         fi
-        echo $TAGS             
+        echo ${{TAGS}}             
 
     - name: Docker meta for python
       id: meta1
