@@ -36,22 +36,26 @@ jobs:
       run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
       id: extract_branch
 
-    - uses: docker/build-push-action@v2
-      name: Build python-staging and push
+    - name: Build python-staging 
+      run: docker build -t ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}} -t ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest -f projects/python/ 
       if: github.ref == 'refs/heads/staging'
-      with:
-        context: ./projects/python
-        push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}}, ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest
+
+    - name: Push python-staging image to DigitalOcean Container Registry
+      run: docker push --all-tags ${{ secrets.registry }}/python   
+      if: github.ref == 'refs/heads/staging'  
+      # with:
+      #   context: ./projects/python
+      #   push: ${{ github.event_name != 'pull_request' }}
+      #   tags: ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}}, ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest
         # labels: ${{ steps.meta1.outputs.labels }}
 
-    - uses: docker/build-push-action@v2
-      name: Build python-dev and push
+    - name: Build python-development 
+      run: docker build -t ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}} -t ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest -f projects/python/ 
       if: github.ref == 'refs/heads/development'
-      with:
-        context: ./projects/python
-        push: ${{ github.event_name != 'pull_request' }}
-        tags: ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest
+
+    - name: Push python-development image to DigitalOcean Container Registry
+      run: docker push --all-tags ${{ secrets.registry }}/python   
+      if: github.ref == 'refs/heads/development' 
         # labels: ${{ steps.meta1.outputs.labels }}    
 
 
