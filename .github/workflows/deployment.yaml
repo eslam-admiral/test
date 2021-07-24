@@ -37,9 +37,9 @@ jobs:
       id: gen_tags
       run: |
         if [[ ${{  steps.extract_branch.outputs.branch  }} == staging ]]; then
-          export TAGS=${{github.run_number}}
+          export TAGS='[${{github.run_number}}]'
         else
-          export TAGS=latest
+          export TAGS='[latest]'
         fi
         echo $TAGS             
 
