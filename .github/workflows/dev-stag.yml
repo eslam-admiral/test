@@ -42,7 +42,8 @@ jobs:
         tags: ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}}, ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest
         labels: ${{ steps.meta1.outputs.labels }}
 
-    - name: Build python-dev and push
+    - uses: docker/build-push-action@v2
+      name: Build python-dev and push
       if: github.ref == 'refs/heads/development'
       with:
         context: ./projects/python
