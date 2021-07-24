@@ -41,7 +41,7 @@ jobs:
         else
           value='["latest"]'
         fi
-        echo '::set-output name=value::'$value             
+        echo '::set-output name=tags::'$value             
 
     - name: Docker meta for python
       id: meta1
@@ -52,7 +52,7 @@ jobs:
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{version}},value=${{ fromJson(steps.gen_tags.outputs.value) }}
+          type=semver,pattern={{version}},value=${{fromJson(steps.gen_tags.outputs.tags)}}
       #if: contains(steps.file_changes.outputs.files , '"projects/python')     
 
     - name: Docker meta for helloworld
@@ -64,7 +64,7 @@ jobs:
           type=ref,event=pr
           type=semver,pattern={{version}}
           type=semver,pattern={{major}}.{{minor}}
-          type=semver,pattern={{version}},value=${{ fromJson(steps.gen_tags.outputs.value) }}
+          type=semver,pattern={{version}},value=${{fromJson(steps.gen_tags.outputs.tags)}}
       #if: contains(steps.file_changes.outputs.files , '"projects/helloworld') 
 
     - name: Build python and push
