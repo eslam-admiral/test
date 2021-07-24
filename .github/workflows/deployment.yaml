@@ -37,11 +37,11 @@ jobs:
       id: gen_tags
       run: |
         if [[ ${{  steps.extract_branch.outputs.branch  }} == staging ]]; then
-          TAGS=${{github.run_number}}
+          export TAGS=${{github.run_number}}
         else
-          TAGS=latest
+          export TAGS=latest
         fi
-        echo '::set-output name=tags::'${TAGS}             
+        echo '::set-output name=tags::'$TAGS             
 
     - name: Docker meta for python
       id: meta1
