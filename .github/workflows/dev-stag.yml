@@ -19,7 +19,11 @@ jobs:
     #     prNumber: $
     #     pushBefore: ''
     #     pushAfter: ''
-
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch  
+      
     - name: Install doctl
       uses: digitalocean/action-doctl@v2
       with:
@@ -50,10 +54,7 @@ jobs:
       if: github.ref == 'refs/heads/development' 
         # labels: ${{ steps.meta1.outputs.labels }} 
 
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch          
+        
 
 
 
