@@ -28,11 +28,6 @@ jobs:
     - name: Log in to DigitalOcean Container Registry with short-lived credentials
       run: doctl registry login --expiry-seconds 1200
 
-    - name: Extract branch name
-      shell: bash
-      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
-      id: extract_branch
-
     - name: Build python-staging 
       run: cd projects/python/ && docker build -t ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}} -t ${{ secrets.registry }}/python:${{ steps.extract_branch.outputs.branch }}-latest .
       if: github.ref == 'refs/heads/staging'
@@ -53,7 +48,12 @@ jobs:
     - name: Push python-development image to DigitalOcean Container Registry
       run: docker push --all-tags ${{ secrets.registry }}/python   
       if: github.ref == 'refs/heads/development' 
-        # labels: ${{ steps.meta1.outputs.labels }}    
+        # labels: ${{ steps.meta1.outputs.labels }} 
+
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch          
 
 
 
