@@ -15,7 +15,7 @@ jobs:
         with:
           image: registry.digitalocean.com/lls/helloworld
           registry: registry.digitalocean.com
-          context: projects/helloworld
+          workdir: projects/helloworld
           semver_higher: true
           username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
