@@ -18,7 +18,7 @@ jobs:
         with:
           tag_ref: ${{ github.ref }}
           git_repository_url: ./projects/helloworld
-          image_name: flownative/docker-base/base
+          image_name: registry.digitalocean.com/lls/base
           registry_password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish release to docker.io
@@ -28,7 +28,7 @@ jobs:
           tag_latest: 'yes'
           tag_custom: 'some-custom-tag'
 
-          source_image_name: docker.pkg.github.com/flownative/docker-base/base
+          source_image_name: registry.digitalocean.com/lls/docker-base/base
           source_registry_username: github
           source_registry_password: ${{ secrets.GITHUB_TOKEN }}
           source_registry_endpoint: https://registry.digitalocean.com/lls/
