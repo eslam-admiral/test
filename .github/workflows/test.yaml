@@ -4,7 +4,7 @@ on:
     branches:
       - master
     tags:
-    - "*.*.*"
+    - "*"
 
 jobs:
   build:
@@ -20,4 +20,5 @@ jobs:
           workdir: projects/helloworld
           username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          tag_semver: skip
           semver_higher: true
