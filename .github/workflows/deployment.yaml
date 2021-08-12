@@ -1,49 +1,49 @@
-on:
-  push:
-    branches:
-      - staging
-    tags:
-        - 'v*'    
-jobs:
-  build:
-    runs-on: ubuntu-latest
-    steps:       
-    - name: Checkout master
-      uses: actions/checkout@main
+# on:
+#   push:
+#     branches:
+#       - staging
+#     tags:
+#         - 'v*'    
+# jobs:
+#   build:
+#     runs-on: ubuntu-latest
+#     steps:       
+#     - name: Checkout master
+#       uses: actions/checkout@main
 
-    - name: Install doctl
-      uses: digitalocean/action-doctl@v2
-      with:
-        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}  
+#     - name: Install doctl
+#       uses: digitalocean/action-doctl@v2
+#       with:
+#         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}  
 
-    - name: Build container image
-      uses: flownative/action-docker-publish-semver@v1.2.0
-      with:
-          tag_ref: ${{ github.ref }}
-          image_name: registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
-          # registry_password: ${{ secrets.GITHUB_TOKEN }}
-      # run: docker build -t registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
+#     - name: Build container image
+#       uses: flownative/action-docker-publish-semver@v1.2.0
+#       with:
+#           tag_ref: ${{ github.ref }}
+#           image_name: registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
+#           # registry_password: ${{ secrets.GITHUB_TOKEN }}
+#       # run: docker build -t registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
 
-    - name: Log in to DigitalOcean Container Registry with short-lived credentials
-      run: doctl registry login --expiry-seconds 1200    
+#     - name: Log in to DigitalOcean Container Registry with short-lived credentials
+#       run: doctl registry login --expiry-seconds 1200    
 
-    - name: Push image to DigitalOcean Container Registry
-      uses: flownative/action-docker-publish-semver@master
-      with:
-        tag_ref: ${{ github.ref }}
-        tag_latest: 'yes'
-        tag_custom: 'some-custom-tag'      
-      # run: docker push registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest  
+#     - name: Push image to DigitalOcean Container Registry
+#       uses: flownative/action-docker-publish-semver@master
+#       with:
+#         tag_ref: ${{ github.ref }}
+#         tag_latest: 'yes'
+#         tag_custom: 'some-custom-tag'      
+#       # run: docker push registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest  
 
-    # - name: Update deployment file
-    #   run: TAG=latest && sed -i 's|<IMAGE>|registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
+#     # - name: Update deployment file
+#     #   run: TAG=latest && sed -i 's|<IMAGE>|registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
 
-    - name: Save DigitalOcean kubeconfig with short-lived credentials
-      run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
+#     - name: Save DigitalOcean kubeconfig with short-lived credentials
+#       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
 
-    - name: Deploy to DigitalOcean Kubernetes
-      run: kubectl -n staging --record deployment.apps/${{GITHUB_WORKFLOW}} set image deployment.v1.apps/${{GITHUB_WORKFLOW}} registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
-      # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
+#     - name: Deploy to DigitalOcean Kubernetes
+#       run: kubectl -n staging --record deployment.apps/${{GITHUB_WORKFLOW}} set image deployment.v1.apps/${{GITHUB_WORKFLOW}} registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
+#       # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
-    - name: Verify deployment
-      run: kubectl -n dev rollout status deployment/${{GITHUB_WORKFLOW}}
+#     - name: Verify deployment
+#       run: kubectl -n dev rollout status deployment/${{GITHUB_WORKFLOW}}
