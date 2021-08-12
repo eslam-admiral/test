@@ -10,23 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }} # This token is provided by Actions, you do not need to create your own token
-        with:
-          tag_name: v1.0.1
-          release_name: Release v1.0.1
-          body: |
-            Changes in this Release
-            - First Change
-            - Second Change
-          draft: false
-          prerelease: false 
-
       - uses: actions/checkout@v2
 
       - name: Publish to Registry
@@ -37,5 +20,5 @@ jobs:
           workdir: projects/helloworld
           username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          tag_semver: skip
+          tag_semver: v1.0.1
           semver_higher: true
