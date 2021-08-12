@@ -20,5 +20,5 @@ jobs:
           workdir: projects/helloworld
           username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          tag_semver: v1.0.1
+          tag_semver: fail
           semver_higher: true
