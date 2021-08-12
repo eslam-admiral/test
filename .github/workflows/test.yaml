@@ -8,32 +8,14 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-
       - uses: actions/checkout@v2
+
+      - name: Publish to Registry
+        uses: sergeysova/docker-publish-action@master
         with:
-          fetch-depth: 1
-
-      - name: Build Docker image
-        uses: flownative/action-docker-build@master
-        with:
-          tag_ref: ${{ github.ref }}
-          git_repository_url: https://registry.digitalocean.com/
-          image_name: registry.digitalocean.com/lls/base
-          registry_password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-
-      - name: Publish release to docker.io
-        uses: flownative/action-docker-publish-semver@master
-        with:
-          tag_ref: ${{ github.ref }}
-          tag_latest: 'yes'
-          tag_custom: 'some-custom-tag'
-
-          source_image_name: registry.digitalocean.com/lls/docker-base/base
-          source_registry_username: github
-          source_registry_password: ${{ secrets.GITHUB_TOKEN }}
-          source_registry_endpoint: https://registry.digitalocean.com/lls/
-
-          target_image_name: flownative/base
-          target_registry_username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          target_registry_password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          target_registry_endpoint: https://registry.digitalocean.com/lls/
+          image: registry.digitalocean.com/lls/helloworld
+          registry: registry.digitalocean.com
+          context: projects/helloworld
+          semver_higher: true
+          username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
