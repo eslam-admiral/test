@@ -23,5 +23,5 @@ jobs:
           password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           tag_semver: skip
           semver_higher: true
-          tag_from_label: version=v1.0.0
+          tag_from_label: v1.0.0
       - run: echo "${{ steps.action.outputs.digest }} / ${{ steps.action.outputs.tag }} / ${{ steps.action.outputs.semver }}"    
