@@ -17,9 +17,9 @@ jobs:
         uses: flownative/action-docker-build@master
         with:
           tag_ref: ${{ github.ref }}
-          git_repository_url: ./projects/helloworld
+          git_repository_url: https://registry.digitalocean.com/
           image_name: registry.digitalocean.com/lls/base
-          registry_password: ${{ secrets.GITHUB_TOKEN }}
+          registry_password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
       - name: Publish release to docker.io
         uses: flownative/action-docker-publish-semver@master
