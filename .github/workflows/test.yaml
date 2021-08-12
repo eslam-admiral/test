@@ -10,18 +10,32 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      # - uses: actions/checkout@v2
 
-      - name: Publish to Registry
-        uses: sergeysova/docker-publish-action@master
-        id: action
+      # - name: Publish to Registry
+      #   uses: sergeysova/docker-publish-action@master
+      #   id: action
+      #   with:
+      #     image: registry.digitalocean.com/lls/helloworld
+      #     registry: registry.digitalocean.com
+      #     workdir: projects/helloworld
+      #     username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      #     password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+      #     tag_semver: skip
+      #     semver_higher: true
+      #     tag_from_label: v1.0.0
+      # - run: echo "${{ steps.action.outputs.digest }} / ${{ steps.action.outputs.tag }} / ${{ steps.action.outputs.semver }}"    
+      - name: Login to registry.digitalocean.com registry
+        run: |
+          echo ${{ secrets. DIGITALOCEAN_ACCESS_TOKEN }} | docker login --username ${{ secrets. DIGITALOCEAN_ACCESS_TOKEN }} --password-stdin registry.digitalocean.com
+
+      - name: Build image
+        run: |
+          docker build -t registry.digitalocean.com/lls/helloworld:latest ./projects/helloworld
+
+      - uses: weseek/ghaction-docker-tags-by-semver@v1
         with:
-          image: registry.digitalocean.com/lls/helloworld
-          registry: registry.digitalocean.com
-          workdir: projects/helloworld
-          username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
-          tag_semver: skip
-          semver_higher: true
-          tag_from_label: v1.0.0
-      - run: echo "${{ steps.action.outputs.digest }} / ${{ steps.action.outputs.tag }} / ${{ steps.action.outputs.semver }}"    
+          source: 'registry.digitalocean.com/lls/helloworld'
+          target: registry.digitalocean.com/lls/helloworld
+          semver: '1.2.3'
+          publish: true
