@@ -3,6 +3,8 @@ on:
   push:
     branches:
       - master
+    tags:
+    - "*"
 
 jobs:
   build:
@@ -16,6 +18,6 @@ jobs:
           image: registry.digitalocean.com/lls/helloworld
           registry: registry.digitalocean.com
           workdir: projects/helloworld
-          semver_higher: true
           username: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
           password: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+          semver_higher: true
