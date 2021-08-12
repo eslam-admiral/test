@@ -1,8 +1,8 @@
 name: Build and release Docker images
 on:
   push:
-    branches-ignore:
-      - '**'
+    branches:
+      - master
     tags:
       - 'v*.*.*'
 
