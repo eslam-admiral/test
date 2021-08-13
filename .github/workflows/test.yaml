@@ -30,7 +30,7 @@ jobs:
           echo ${{ secrets. DIGITALOCEAN_ACCESS_TOKEN }} | docker login --username ${{ secrets. DIGITALOCEAN_ACCESS_TOKEN }} --password-stdin registry.digitalocean.com
 
       - name: Build image
-        run: docker build  -t registry.digitalocean.com/lls/helloworld:latest -f projects/helloworld/Dockerfile .
+        run: cd projects/helloworld && docker build  -t registry.digitalocean.com/lls/helloworld:latest .
 
       - uses: weseek/ghaction-docker-tags-by-semver@v1.0.5
         with:
