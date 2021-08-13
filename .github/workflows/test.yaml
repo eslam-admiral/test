@@ -31,7 +31,7 @@ jobs:
 
       - name: Build image
         run: |
-          docker build -f projects/helloworld/Dockerfile -t registry.digitalocean.com/lls/helloworld:latest .
+          docker build  -t registry.digitalocean.com/lls/helloworld:latest -f projects/helloworld/Dockerfile .
 
       - uses: weseek/ghaction-docker-tags-by-semver@v1.0.5
         with:
