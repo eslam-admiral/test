@@ -33,7 +33,7 @@ jobs:
         run: |
           docker build -t registry.digitalocean.com/lls/helloworld:latest ./projects/helloworld
 
-      - uses: weseek/ghaction-docker-tags-by-semver@v1
+      - uses: weseek/ghaction-docker-tags-by-semver@v1.0.5
         with:
           source: 'registry.digitalocean.com/lls/helloworld'
           target: registry.digitalocean.com/lls/helloworld
