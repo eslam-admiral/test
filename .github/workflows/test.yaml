@@ -30,12 +30,11 @@ jobs:
           echo ${{ secrets. DIGITALOCEAN_ACCESS_TOKEN }} | docker login --username ${{ secrets. DIGITALOCEAN_ACCESS_TOKEN }} --password-stdin registry.digitalocean.com
 
       - name: Build image
-        run: |
-          docker build  -t registry.digitalocean.com/lls/helloworld:latest -f projects/helloworld/Dockerfile .
+        run: docker build  -t registry.digitalocean.com/lls/helloworld:latest -f projects/helloworld/Dockerfile .
 
       - uses: weseek/ghaction-docker-tags-by-semver@v1.0.5
         with:
           source: 'registry.digitalocean.com/lls/helloworld'
           target: registry.digitalocean.com/lls/helloworld
-          semver: '1.2.3'
+          semver: '1.0.0'
           publish: true
