@@ -29,17 +29,6 @@ jobs:
       #   run: |
       #     echo ${{ secrets. DIGITALOCEAN_ACCESS_TOKEN }} | docker login --username ${{ secrets. DIGITALOCEAN_ACCESS_TOKEN }} --password-stdin registry.digitalocean.com
 
-      # - name: Build image
-      #   run: cd projects/helloworld && docker build  -t registry.digitalocean.com/lls/helloworld:latest .
-
-
-      # - uses: weseek/ghaction-docker-tags-by-semver@v1.0.5
-      #   with:
-      #     source: 'registry.digitalocean.com/lls/helloworld'
-      #     target: registry.digitalocean.com/lls/helloworld
-      #     semver: '${{ github.ref }}'
-      #     publish: true
-
        
       - name: Docker meta
         id: meta
