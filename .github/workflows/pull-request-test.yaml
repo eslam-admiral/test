@@ -3,7 +3,6 @@ on:
     branches:
     - "feature/*"  # Support wildcard matching
 
-
 jobs:
   pull-request:
     runs-on: ubuntu-latest
