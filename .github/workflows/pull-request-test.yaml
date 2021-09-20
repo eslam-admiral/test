@@ -1,6 +1,6 @@
 on:
   pull_request:
-    types: [opened, synchronize, closed]
+    types: [closed]
     branches:
     - "staging"  # Support wildcard matching
 
