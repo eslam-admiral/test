@@ -1,49 +1,65 @@
-# on:
-#   push:
-#     branches:
-#       - staging
-#     tags:
-#         - 'v*'    
-# jobs:
-#   build:
-#     runs-on: ubuntu-latest
-#     steps:       
-#     - name: Checkout master
-#       uses: actions/checkout@main
+name: master
+on:
+  push:
+    branches:
+      # - staging
+      - master
+    # tags:
+    #     - 'v*'    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:       
+    - name: Checkout branch
+      uses: actions/checkout@v2
 
-#     - name: Install doctl
-#       uses: digitalocean/action-doctl@v2
-#       with:
-#         token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}  
+    # - id: file_changes
+    #   name: File Changes
+    #   uses: trilom/file-changes-action@v1.2.3
+    #   with:
+    #     prNumber: $
+    #     pushBefore: ''
+    #     pushAfter: ''
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch  
+      
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
 
-#     - name: Build container image
-#       uses: flownative/action-docker-publish-semver@v1.2.0
-#       with:
-#           tag_ref: ${{ github.ref }}
-#           image_name: registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
-#           # registry_password: ${{ secrets.GITHUB_TOKEN }}
-#       # run: docker build -t registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest .  
+    - name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 1200
 
-#     - name: Log in to DigitalOcean Container Registry with short-lived credentials
-#       run: doctl registry login --expiry-seconds 1200    
+    - name: Build python-staging 
+      run: cd projects/python/ && docker build -t ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}} -t ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-latest .
+      if: github.ref == 'refs/heads/staging'
 
-#     - name: Push image to DigitalOcean Container Registry
-#       uses: flownative/action-docker-publish-semver@master
-#       with:
-#         tag_ref: ${{ github.ref }}
-#         tag_latest: 'yes'
-#         tag_custom: 'some-custom-tag'      
-#       # run: docker push registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:latest  
+    # - name: Push python-staging image to DigitalOcean Container Registry
+    #   run: docker push --all-tags ${{ secrets.REGISTRY }}/python   
+    #   if: github.ref == 'refs/heads/staging'  
+      # with:
+      #   context: ./projects/python
+      #   push: ${{ github.event_name != 'pull_request' }}
+      #   tags: ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}}, ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-latest
+        # labels: ${{ steps.meta1.outputs.labels }}
 
-#     # - name: Update deployment file
-#     #   run: TAG=latest && sed -i 's|<IMAGE>|registry.digitalocean.com/${{ secrets.registry }}/llsgscv-dev/helloworld:'${TAG}'|' $GITHUB_WORKSPACE/config/deployment.yml
+    - name: Build python-development 
+      run: cd projects/python/ && docker build -t ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-latest .
+      if: github.ref == 'refs/heads/development'
 
-#     - name: Save DigitalOcean kubeconfig with short-lived credentials
-#       run: doctl kubernetes cluster kubeconfig save --expiry-seconds 600 ${{ secrets.cluster_name }}
+    # - name: Push python-development image to DigitalOcean Container Registry
+    #   run: docker push --all-tags ${{ secrets.REGISTRY }}/python   
+    #   if: github.ref == 'refs/heads/development' 
+        # labels: ${{ steps.meta1.outputs.labels }} 
+    - name: delete branch
+      uses: SvanBoxel/delete-merged-branch@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
 
-#     - name: Deploy to DigitalOcean Kubernetes
-#       run: kubectl -n staging --record deployment.apps/${{GITHUB_WORKFLOW}} set image deployment.v1.apps/${{GITHUB_WORKFLOW}} registry.digitalocean.com/${{ secrets.registry }}/${{GITHUB_WORKFLOW}}:${{ github.ref }}-${{github.run_number}}
-#       # run: kubectl apply -f $GITHUB_WORKSPACE/config/deployment.yml
 
-#     - name: Verify deployment
-#       run: kubectl -n dev rollout status deployment/${{GITHUB_WORKFLOW}}
+
+
