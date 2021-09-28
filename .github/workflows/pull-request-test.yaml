@@ -29,8 +29,9 @@ jobs:
         # pr_draft: true                                    # Creates pull request as draft
         # pr_allow_empty: true                              # Creates pull request even if there are no changes
         github_token: ${{ secrets.GITHUB_TOKEN }}
-
+        
     - name: delete branch
+      if: contains(github.ref, "master")
       uses: SvanBoxel/delete-merged-branch@main
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}    
