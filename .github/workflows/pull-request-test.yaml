@@ -2,7 +2,8 @@ on:
   pull_request:
     types: [closed]
     branches:
-    - "staging"  # Support wildcard matching
+    - "staging"
+    # - "master"  # Support wildcard matching
 
 
 
@@ -30,3 +31,7 @@ jobs:
         # pr_allow_empty: true                              # Creates pull request even if there are no changes
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
+    # - name: delete branch
+    #   uses: SvanBoxel/delete-merged-branch@main
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
