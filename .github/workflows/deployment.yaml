@@ -1,0 +1,65 @@
+name: master
+on:
+  push:
+    branches:
+      # - staging
+      - master
+    # tags:
+    #     - 'v*'    
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:       
+    - name: Checkout branch
+      uses: actions/checkout@v2
+
+    # - id: file_changes
+    #   name: File Changes
+    #   uses: trilom/file-changes-action@v1.2.3
+    #   with:
+    #     prNumber: $
+    #     pushBefore: ''
+    #     pushAfter: ''
+    - name: Extract branch name
+      shell: bash
+      run: echo "##[set-output name=branch;]$(echo ${GITHUB_REF#refs/heads/})"
+      id: extract_branch  
+      
+    - name: Install doctl
+      uses: digitalocean/action-doctl@v2
+      with:
+        token: ${{ secrets.DIGITALOCEAN_ACCESS_TOKEN }}
+
+    - name: Log in to DigitalOcean Container Registry with short-lived credentials
+      run: doctl registry login --expiry-seconds 1200
+
+    - name: Build python-staging 
+      run: cd projects/python/ && docker build -t ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}} -t ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-latest .
+      if: github.ref == 'refs/heads/staging'
+
+    # - name: Push python-staging image to DigitalOcean Container Registry
+    #   run: docker push --all-tags ${{ secrets.REGISTRY }}/python   
+    #   if: github.ref == 'refs/heads/staging'  
+      # with:
+      #   context: ./projects/python
+      #   push: ${{ github.event_name != 'pull_request' }}
+      #   tags: ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-${{github.run_number}}, ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-latest
+        # labels: ${{ steps.meta1.outputs.labels }}
+
+    - name: Build python-development 
+      run: cd projects/python/ && docker build -t ${{ secrets.REGISTRY }}/python:${{ steps.extract_branch.outputs.branch }}-latest .
+      if: github.ref == 'refs/heads/development'
+
+    # - name: Push python-development image to DigitalOcean Container Registry
+    #   run: docker push --all-tags ${{ secrets.REGISTRY }}/python   
+    #   if: github.ref == 'refs/heads/development' 
+        # labels: ${{ steps.meta1.outputs.labels }} 
+    - name: delete branch
+      uses: SvanBoxel/delete-merged-branch@main
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        
+
+
+
+
