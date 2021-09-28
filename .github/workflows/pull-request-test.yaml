@@ -3,7 +3,7 @@ on:
     types: [closed]
     branches:
     - "staging"
-    - "master"  # Support wildcard matching
+    # - "master"  # Support wildcard matching
 
 
 
@@ -16,7 +16,6 @@ jobs:
     steps:
     - uses: actions/checkout@v2  
     - name: pull-request
-      if: github.ref == 'refs/heads/staging'
       uses: repo-sync/pull-request@v2
       with:
         source_branch: "${{ github.head_ref }}"                                 # If blank, default: triggered branch
@@ -32,8 +31,7 @@ jobs:
         # pr_allow_empty: true                              # Creates pull request even if there are no changes
         github_token: ${{ secrets.GITHUB_TOKEN }}
 
-    - name: delete branch
-      if: github.ref == 'refs/heads/master'
-      uses: SvanBoxel/delete-merged-branch@main
-      env:
-        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    # - name: delete branch
+    #   uses: SvanBoxel/delete-merged-branch@main
+    #   env:
+    #     GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
